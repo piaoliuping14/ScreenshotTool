@@ -12,6 +12,12 @@
 - 可选全局快捷键（默认不启用，设置中自行绑定，自动检测占用冲突）
 - 保存位置可自定义；单实例运行；无托盘、无自启，保持精简
 
+## 下载
+
+前往 [Releases](https://github.com/piaoliuping14/ScreenshotTool/releases/latest) 下载 `ScreenshotTool.exe`（单文件版，约 68 MB，已内置运行时）。
+
+保存到任意文件夹（如 `桌面` 或 `D:\工具\`）双击即可使用，无需安装；删除文件即卸载。
+
 ## 运行环境
 
 - Windows 10 / 11
