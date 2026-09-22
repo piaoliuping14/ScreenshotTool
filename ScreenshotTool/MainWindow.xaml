@@ -1,0 +1,101 @@
+<Window x:Class="ScreenshotTool.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="截图工具"
+        Width="148" Height="38"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        Topmost="True"
+        ResizeMode="NoResize"
+        WindowStartupLocation="Manual">
+    <!-- P1 正式主界面：置顶无边框小条（应用名 + 截图按钮 + 设置齿轮），可拖动、记住位置 -->
+    <Window.Resources>
+        <Style x:Key="CaptureBtn" TargetType="Button">
+            <Setter Property="Background" Value="#00897B"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="bd" Background="{TemplateBinding Background}"
+                                CornerRadius="5" Padding="10,3">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="bd" Property="Background" Value="#00695C"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="bd" Property="Background" Value="#004D40"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="GhostBtn" TargetType="Button">
+            <Setter Property="Foreground" Value="#ECEFF1"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="bd" Background="Transparent"
+                                CornerRadius="5" Padding="4,2">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="bd" Property="Background" Value="#4A5257"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+    <Border x:Name="RootBorder" CornerRadius="8" Background="#2F3437" Padding="10,6"
+            MouseLeftButtonDown="OnRootMouseDown">
+        <Border.Effect>
+            <DropShadowEffect BlurRadius="8" ShadowDepth="1" Opacity="0.28"/>
+        </Border.Effect>
+        <Border.ContextMenu>
+            <ContextMenu>
+                <MenuItem Header="打开设置" Click="OnSettingsClick"/>
+                <Separator/>
+                <MenuItem Header="退出" Click="OnExitClick"/>
+            </ContextMenu>
+        </Border.ContextMenu>
+        <DockPanel>
+            <Button x:Name="GearButton" DockPanel.Dock="Right" Style="{StaticResource GhostBtn}"
+                    Content="⚙" ToolTip="设置" Click="OnSettingsClick"/>
+            <Button x:Name="CaptureButton" DockPanel.Dock="Right" Style="{StaticResource CaptureBtn}"
+                    Content="截图" Margin="0,0,8,0" ToolTip="开始截图" Click="OnCaptureClick"/>
+            <TextBlock Text="截图工具" Foreground="#ECEFF1" FontWeight="SemiBold" FontSize="12"
+                       VerticalAlignment="Center"/>
+        </DockPanel>
+    </Border>
+
+    <!-- P2 保存成功气泡：显示文件名，点击打开截图所在文件夹 -->
+    <Popup x:Name="SavedPopup" PlacementTarget="{Binding ElementName=RootBorder}"
+           Placement="Bottom" VerticalOffset="4"
+           AllowsTransparency="True" StaysOpen="False" PopupAnimation="Fade">
+        <Border Background="#2F3437" CornerRadius="6" Padding="10,5" Cursor="Hand"
+                MouseLeftButtonDown="OnBubbleMouseDown">
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="6" ShadowDepth="1" Opacity="0.3"/>
+            </Border.Effect>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="✓" Foreground="#26A69A" FontWeight="Bold" FontSize="12"/>
+                <TextBlock x:Name="BubbleText" Foreground="#ECEFF1" FontSize="11" Margin="5,0,0,0"
+                           VerticalAlignment="Center"/>
+            </StackPanel>
+        </Border>
+    </Popup>
+    </Grid>
+</Window>

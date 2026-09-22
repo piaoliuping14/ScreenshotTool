@@ -1,0 +1,114 @@
+<Window x:Class="ScreenshotTool.EditorWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="截图编辑" WindowStyle="None" AllowsTransparency="True"
+        Background="Transparent" ResizeMode="NoResize" ShowInTaskbar="False"
+        Topmost="True" WindowStartupLocation="Manual" UseLayoutRounding="True">
+    <!-- P3 编辑器（大纲 3.3 / 4.3）：选区图像 + 紧贴工具条（三级定位）+ 画笔/橡皮面板 -->
+    <Window.Resources>
+        <Style x:Key="ToolBtn" TargetType="Button">
+            <Setter Property="Width" Value="34"/>
+            <Setter Property="Height" Value="26"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Foreground" Value="#ECEFF1"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="bd" Background="{TemplateBinding Background}"
+                                CornerRadius="5">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="bd" Property="Background" Value="#4A5257"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="ActionBtn" TargetType="Button" BasedOn="{StaticResource ToolBtn}">
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Opacity" Value="0.82"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="SizeBtn" TargetType="Button" BasedOn="{StaticResource ToolBtn}">
+            <Setter Property="Width" Value="32"/>
+            <Setter Property="Height" Value="28"/>
+        </Style>
+    </Window.Resources>
+
+    <!-- 最外层不透明底色：工具条区域为实色底座，与选区图像界限分明（避免透明透视误以为工具条在图内） -->
+    <Border Background="#2F3437" BorderBrush="#8000E5FF" BorderThickness="1">
+        <Grid x:Name="RootGrid">
+            <Image x:Name="EditImage" Stretch="Fill" Cursor="Cross"
+                   MouseLeftButtonDown="OnImageMouseDown"
+                   MouseMove="OnImageMouseMove"
+                   MouseLeftButtonUp="OnImageMouseUp"/>
+
+            <!-- 工具条：选区下方优先，放不下则上方；绝不遮图；拖动工具条可移动窗口 -->
+            <Border x:Name="Toolbar" Background="#F02F3437" CornerRadius="7" Padding="5,4"
+                    HorizontalAlignment="Left" VerticalAlignment="Center" Margin="4,0,0,0"
+                    Cursor="SizeAll" MouseLeftButtonDown="OnToolbarMouseDown">
+                <StackPanel Orientation="Horizontal" Background="Transparent">
+                    <Button x:Name="PointerBtn" Style="{StaticResource ToolBtn}" Content="↖"
+                            ToolTip="指针：在图内按住拖动，移动截图位置" Click="OnPointerClick"/>
+                    <Button x:Name="PenBtn" Style="{StaticResource ToolBtn}" Content="🖌"
+                            ToolTip="画笔：颜色 / 粗细" Click="OnPenClick"/>
+                    <Button x:Name="EraserBtn" Style="{StaticResource ToolBtn}" Content="🧽"
+                            ToolTip="橡皮：粗细" Click="OnEraserClick"/>
+                    <Rectangle Width="1" Height="18" Fill="#4A5257" Margin="5,0"/>
+                    <Button x:Name="SaveBtn" Style="{StaticResource ActionBtn}" Content="✓"
+                            Background="#43A047" ToolTip="保存（Enter）" Click="OnSaveClick"/>
+                    <Button x:Name="CancelBtn" Style="{StaticResource ActionBtn}" Content="✕"
+                            Background="#E53935" ToolTip="取消（Esc）" Click="OnCancelClick"/>
+                </StackPanel>
+            </Border>
+
+            <!-- 画笔面板：色板 + 粗细 -->
+            <Popup x:Name="PenPopup" PlacementTarget="{Binding ElementName=PenBtn}" Placement="Top"
+                   StaysOpen="False" AllowsTransparency="True" PopupAnimation="Fade">
+                <Border Background="#F02F3437" CornerRadius="7" Padding="10,8">
+                    <StackPanel>
+                        <UniformGrid x:Name="ColorGrid" Columns="3"/>
+                        <Rectangle Height="1" Fill="#4A5257" Margin="0,8,0,6"/>
+                        <TextBlock Text="粗细" Foreground="#90A4AE" FontSize="10" Margin="2,0,0,4"/>
+                        <StackPanel Orientation="Horizontal">
+                            <Button x:Name="PenS1" Style="{StaticResource SizeBtn}" Tag="2"
+                                    Content="●" FontSize="7" Click="OnPenSizeClick"/>
+                            <Button x:Name="PenS2" Style="{StaticResource SizeBtn}" Tag="4"
+                                    Content="●" FontSize="11" Click="OnPenSizeClick"/>
+                            <Button x:Name="PenS3" Style="{StaticResource SizeBtn}" Tag="8"
+                                    Content="●" FontSize="17" Click="OnPenSizeClick"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+            </Popup>
+
+            <!-- 橡皮面板：粗细 -->
+            <Popup x:Name="EraserPopup" PlacementTarget="{Binding ElementName=EraserBtn}" Placement="Top"
+                   StaysOpen="False" AllowsTransparency="True" PopupAnimation="Fade">
+                <Border Background="#F02F3437" CornerRadius="7" Padding="10,8">
+                    <StackPanel>
+                        <TextBlock Text="橡皮粗细" Foreground="#90A4AE" FontSize="10" Margin="2,0,0,4"/>
+                        <StackPanel Orientation="Horizontal">
+                            <Button x:Name="EraS1" Style="{StaticResource SizeBtn}" Tag="10"
+                                    Content="●" FontSize="7" Click="OnEraserSizeClick"/>
+                            <Button x:Name="EraS2" Style="{StaticResource SizeBtn}" Tag="20"
+                                    Content="●" FontSize="11" Click="OnEraserSizeClick"/>
+                            <Button x:Name="EraS3" Style="{StaticResource SizeBtn}" Tag="40"
+                                    Content="●" FontSize="17" Click="OnEraserSizeClick"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+            </Popup>
+        </Grid>
+    </Border>
+</Window>
