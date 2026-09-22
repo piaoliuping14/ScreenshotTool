@@ -18,6 +18,11 @@
 
 保存到任意文件夹（如 `桌面` 或 `D:\工具\`）双击即可使用，无需安装；删除文件即卸载。
 
+> **国内下载慢？**
+> - 加速直链：[ScreenshotTool.exe 加速下载](https://ghfast.top/https://github.com/piaoliuping14/ScreenshotTool/releases/download/v0.1.0/ScreenshotTool.exe)
+> - 通用方法：在任意 GitHub 下载链接前加 `https://ghfast.top/` 前缀即可加速（第三方公益代理，失效时可换 `https://gh-proxy.com/`）
+> - 也可用多线程下载工具（IDM / Free Download Manager）下载原始链接
+
 ## 运行环境
 
 - Windows 10 / 11
